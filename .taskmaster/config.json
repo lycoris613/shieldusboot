@@ -1,9 +1,9 @@
 {
   "models": {
     "main": {
-      "provider": "gemini-cli",
-      "modelId": "gemini-3-flash-preview",
-      "maxTokens": 1048576,
+      "provider": "claude-code",
+      "modelId": "sonnet",
+      "maxTokens": 64000,
       "temperature": 0.2
     },
     "research": {
@@ -31,7 +31,8 @@
     "responseLanguage": "korean",
     "enableCodebaseAnalysis": true,
     "enableProxy": false,
-    "anonymousTelemetry": true
+    "anonymousTelemetry": true,
+    "userId": "1234567890"
   },
   "claudeCode": {},
   "codexCli": {},

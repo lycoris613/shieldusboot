@@ -1,0 +1,170 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "로컬 백엔드 서버 실행 및 Health Check 검증",
+        "description": "uvicorn을 사용하여 FastAPI 백엔드 서버를 로컬에서 실행하고, Health Check 엔드포인트 및 Swagger UI 접근을 확인합니다.",
+        "details": "1. 가상환경 활성화 확인 (.venv)\n2. 백엔드 디렉토리에서 uvicorn 실행: `uv run uvicorn backend.main:app --reload --port 8000`\n3. 브라우저에서 http://localhost:8000/health 접속 → {\"status\": \"ok\"} 응답 확인\n4. Swagger UI 접속: http://localhost:8000/docs → API 문서가 정상적으로 렌더링되는지 확인\n5. 서버 로그에서 에러가 없는지 확인\n\n**주의사항**:\n- .env 파일에 UPSTAGE_API_KEY가 올바르게 설정되어 있는지 확인\n- CORS 설정이 활성화되어 프론트엔드에서 호출 가능한지 확인",
+        "testStrategy": "- Health Check 엔드포인트 호출 시 200 OK 및 {\"status\": \"ok\"} 응답 확인\n- Swagger UI(/docs)가 브라우저에서 정상 렌더링되는지 확인\n- uvicorn 서버 로그에 에러나 경고가 없는지 확인",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Swagger UI를 통한 /api/convert 엔드포인트 단위 테스트",
+        "description": "Swagger UI 또는 curl을 사용하여 /api/convert API가 4가지 수신 대상(boss/colleague/client/team)에 대해 정상 작동하는지 테스트합니다.",
+        "details": "1. Swagger UI(http://localhost:8000/docs)에서 POST /api/convert 엔드포인트 선택\n2. 각 수신 대상별로 테스트 요청 실행:\n   - boss: {\"text\": \"내일까지 보고서 제출 어려울 것 같음\", \"target_audience\": \"boss\"}\n   - colleague: {\"text\": \"자료 공유 부탁드립니다\", \"target_audience\": \"colleague\"}\n   - client: {\"text\": \"배송이 지연되고 있습니다\", \"target_audience\": \"client\"}\n   - team: {\"text\": \"회의 시간 변경 가능?\", \"target_audience\": \"team\"}\n3. 각 응답에서 converted_text, target_audience, original_text 필드가 모두 포함되어 있는지 확인\n4. 변환된 텍스트가 각 대상에 맞는 어조로 생성되었는지 검토\n5. 에러 케이스 테스트: 잘못된 target_audience 값 전달 시 422 에러 확인\n\n**Solar-Pro3 연동 검증**:\n- 실제 Upstage API 호출이 정상적으로 이루어지는지 확인\n- API 키가 유효한지, 응답 시간이 적절한지 확인",
+        "testStrategy": "- 4가지 수신 대상 모두에 대해 200 OK 응답 및 적절한 말투 변환 확인\n- 잘못된 target_audience 입력 시 422 Unprocessable Entity 에러 발생 확인\n- 빈 text 입력 시 422 에러 확인\n- 응답 시간이 10초 이내인지 확인 (LLM 호출 포함)",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "프론트엔드 정적 파일 서빙 확인",
+        "description": "FastAPI의 StaticFiles 마운트를 통해 frontend/index.html이 루트 경로(/)에서 정상적으로 제공되는지 확인합니다.",
+        "details": "1. 백엔드 서버가 실행 중인 상태에서 브라우저로 http://localhost:8000/ 접속\n2. index.html이 정상적으로 렌더링되는지 확인\n3. CSS 파일(frontend/css/style.css)이 올바르게 로드되어 스타일이 적용되는지 확인\n4. JavaScript 파일(frontend/js/app.js)이 정상 로드되는지 개발자 도구에서 확인\n5. 브라우저 개발자 도구(F12) → Network 탭에서 정적 자원 로딩 에러가 없는지 확인\n\n**구현 확인 사항**:\n- main.py에서 frontend 디렉토리를 StaticFiles로 마운트했는지 확인\n- index.html의 상대 경로(css/, js/)가 올바르게 참조되는지 확인",
+        "testStrategy": "- 브라우저에서 http://localhost:8000/ 접속 시 \"업무 말투 변환기\" 페이지가 정상 표시되는지 확인\n- 개발자 도구 Console에 JavaScript 에러가 없는지 확인\n- Network 탭에서 모든 정적 자원(HTML, CSS, JS)이 200 OK로 로드되는지 확인",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "프론트엔드 UI 인터랙션 테스트 (텍스트 입력 및 문자 수 카운터)",
+        "description": "텍스트 입력창에 텍스트를 입력했을 때 문자 수 카운터가 정상 작동하고, 500자 초과 시 시각적 표시가 나타나는지 테스트합니다.",
+        "details": "1. 브라우저에서 http://localhost:8000/ 접속\n2. 텍스트 입력창에 다양한 길이의 텍스트 입력\n3. 문자 수 카운터(#charCount)가 실시간으로 업데이트되는지 확인\n4. 500자 이하: 일반 표시\n5. 500자 초과: .is-over 클래스가 추가되어 시각적으로 경고 표시되는지 확인\n\n**코드 확인**:\n- app.js의 inputText.addEventListener(\"input\", ...) 핸들러가 정상 작동하는지 확인\n- CSS에서 .is-over 스타일이 적용되는지 확인",
+        "testStrategy": "- 텍스트 입력 시 실시간으로 \"N / 500\" 형식의 카운터가 업데이트되는지 확인\n- 500자 초과 입력 시 문자 수 카운터의 색상이나 스타일이 변경되는지 확인\n- 입력 후 텍스트 삭제 시 카운터가 정확히 감소하는지 확인",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "프론트엔드 수신 대상 선택 버튼 기능 테스트",
+        "description": "4개의 수신 대상 버튼(상사/타팀 동료/고객/팀 동료) 클릭 시 선택 상태가 토글되고, 한 번에 하나만 선택되는지 테스트합니다.",
+        "details": "1. 각 수신 대상 버튼을 순차적으로 클릭\n2. 클릭한 버튼의 aria-pressed 속성이 \"true\"로 변경되고, 체크박스가 [x]로 표시되는지 확인\n3. 다른 버튼 클릭 시 이전 버튼의 선택이 해제되고 새 버튼만 선택되는지 확인 (단일 선택)\n4. 선택된 버튼의 배경색이 var(--ink)로 변경되는지 확인 (CSS .target-btn[aria-pressed=\"true\"])\n5. 선택 해제된 버튼은 체크박스가 [ ]로 돌아가는지 확인\n\n**코드 확인**:\n- app.js의 targetButtons.forEach 이벤트 핸들러가 정상 작동하는지 확인\n- selectedTarget 변수에 올바른 값(boss/colleague/client/team)이 저장되는지 확인",
+        "testStrategy": "- 각 버튼 클릭 시 해당 버튼만 활성화(배경색 변경, 체크박스 [x])되는지 확인\n- 다른 버튼 클릭 시 이전 선택이 즉시 해제되는지 확인\n- 브라우저 개발자 도구에서 selectedTarget 변수 값이 올바르게 설정되는지 확인",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "프론트엔드 폼 유효성 검사 테스트",
+        "description": "[변환하기] 버튼 클릭 시 텍스트 미입력 또는 수신 대상 미선택 상태에서 적절한 에러 메시지가 표시되는지 테스트합니다.",
+        "details": "1. 텍스트 미입력 + 수신 대상 미선택 상태에서 [변환하기] 버튼 클릭\n   → \"원문을 입력해 주세요.\" 메시지 표시 및 입력창에 포커스 이동 확인\n2. 텍스트 입력 + 수신 대상 미선택 상태에서 [변환하기] 버튼 클릭\n   → \"수신 대상을 선택해 주세요.\" 메시지 표시 확인\n3. 텍스트와 수신 대상 모두 입력된 상태에서는 API 호출이 진행되는지 확인\n\n**코드 확인**:\n- app.js의 form.addEventListener(\"submit\", ...) 내 유효성 검사 로직 확인\n- setStatus() 함수가 올바르게 호출되어 #statusMessage에 메시지가 표시되는지 확인",
+        "testStrategy": "- 텍스트 미입력 시 에러 메시지 표시 및 포커스 이동 확인\n- 수신 대상 미선택 시 에러 메시지 표시 확인\n- 유효성 검사 통과 시 API 호출이 진행되는지 확인 (로딩 표시 확인)",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "프론트엔드 → 백엔드 API 호출 통합 테스트",
+        "description": "프론트엔드에서 [변환하기] 버튼 클릭 시 백엔드 /api/convert 엔드포인트로 올바른 요청이 전송되고, 응답이 정상적으로 처리되는지 테스트합니다.",
+        "details": "1. 텍스트 입력: \"내일까지 보고서 제출 어려울 것 같음\"\n2. 수신 대상 선택: 상사\n3. [변환하기] 버튼 클릭\n4. 브라우저 개발자 도구 → Network 탭에서 POST /api/convert 요청 확인\n5. 요청 페이로드에 {\"text\": \"...\", \"target_audience\": \"boss\"} 포함 여부 확인\n6. 응답 200 OK 및 JSON 본문에 converted_text, target_audience, original_text 포함 확인\n7. 로딩 표시가 API 호출 중에 나타나고, 응답 후 사라지는지 확인\n8. 변환 결과가 화면의 결과 영역(#resultText)에 표시되는지 확인\n9. [복사하기] 버튼이 활성화되는지 확인\n\n**CORS 확인**:\n- 브라우저 Console에 CORS 에러가 발생하지 않는지 확인\n- main.py의 CORSMiddleware 설정이 올바른지 확인",
+        "testStrategy": "- Network 탭에서 POST /api/convert 요청이 200 OK로 완료되는지 확인\n- 응답 JSON에 converted_text가 포함되어 있고, 화면에 올바르게 렌더링되는지 확인\n- 로딩 표시(\"인 쇄 중\")가 API 호출 중에만 나타나는지 확인\n- Console에 JavaScript 에러나 CORS 에러가 없는지 확인",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "프론트엔드 결과 표시 및 타이핑 애니메이션 테스트",
+        "description": "변환 결과가 타이핑 애니메이션과 함께 화면에 표시되고, 애니메이션이 완료되는지 테스트합니다.",
+        "details": "1. API 호출 성공 후 결과 영역(#resultOutput)에서 빈 상태 메시지(#emptyState)가 숨겨지고, 결과 텍스트(#resultText)가 표시되는지 확인\n2. 타이핑 애니메이션이 시작되어 글자가 하나씩 출력되는 효과가 나타나는지 확인\n3. 애니메이션 완료 후 .is-typing 클래스가 제거되는지 확인\n4. prefers-reduced-motion 설정이 활성화된 경우 애니메이션 없이 즉시 전체 텍스트가 표시되는지 확인\n\n**코드 확인**:\n- app.js의 typeOut() 함수가 정상 작동하는지 확인\n- CSS에서 .is-typing::after 스타일이 깜빡이는 커서 효과를 생성하는지 확인",
+        "testStrategy": "- 변환 완료 후 결과 텍스트가 타이핑 애니메이션과 함께 표시되는지 확인\n- 애니메이션 완료 후 커서(::after)가 사라지는지 확인\n- 브라우저 설정에서 prefers-reduced-motion: reduce 활성화 시 애니메이션이 비활성화되는지 확인",
+        "priority": "low",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "프론트엔드 복사하기 버튼 기능 테스트",
+        "description": "[복사하기] 버튼 클릭 시 변환 결과가 클립보드에 복사되고, 복사 완료 메시지가 표시되는지 테스트합니다.",
+        "details": "1. 변환 결과가 표시된 상태에서 [복사하기] 버튼 클릭\n2. navigator.clipboard.writeText() API를 통해 클립보드에 결과 텍스트가 복사되는지 확인\n3. 버튼 텍스트가 \"[ 복사 완료 ]\"로 1.5초간 변경되었다가 원래대로 돌아오는지 확인\n4. 실제로 클립보드에 텍스트가 복사되었는지 다른 애플리케이션(메모장 등)에 붙여넣기하여 확인\n5. 복사 실패 시 에러 메시지(\"복사에 실패했습니다. 직접 선택해 복사해 주세요.\")가 표시되는지 확인\n\n**코드 확인**:\n- app.js의 copyBtn.addEventListener(\"click\", ...) 핸들러가 정상 작동하는지 확인\n- 클립보드 API가 브라우저에서 지원되는지 확인 (HTTPS 또는 localhost 필요)",
+        "testStrategy": "- 복사하기 버튼 클릭 시 버튼 텍스트가 \"[ 복사 완료 ]\"로 변경되는지 확인\n- 1.5초 후 버튼 텍스트가 원래대로 돌아오는지 확인\n- 다른 애플리케이션에 붙여넣기하여 정확한 텍스트가 복사되었는지 확인\n- 클립보드 API 미지원 브라우저에서는 에러 메시지가 표시되는지 확인",
+        "priority": "medium",
+        "dependencies": [
+          7,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "프론트엔드 에러 처리 테스트 (API 호출 실패)",
+        "description": "백엔드 서버가 응답하지 않거나 에러를 반환할 때 프론트엔드에서 적절한 에러 메시지가 표시되는지 테스트합니다.",
+        "details": "1. 백엔드 서버를 중지한 상태에서 프론트엔드에서 변환 요청 시도\n   → 네트워크 에러 발생 → \"변환에 실패했습니다. 잠시 후 다시 시도해 주세요.\" 메시지 표시 확인\n2. 백엔드 서버를 재시작하고, .env 파일에서 UPSTAGE_API_KEY를 잘못된 값으로 변경\n   → API 호출 실패 → 500 에러 응답 → 에러 메시지 표시 확인\n3. 에러 발생 시 결과 영역에 .has-error 클래스가 추가되고, [복사하기] 버튼이 비활성화되는지 확인\n4. 로딩 표시가 에러 발생 후에도 올바르게 해제되는지 확인\n\n**코드 확인**:\n- app.js의 try-catch 블록에서 showError() 함수가 호출되는지 확인\n- showError() 함수가 에러 메시지를 표시하고 UI 상태를 올바르게 업데이트하는지 확인",
+        "testStrategy": "- 백엔드 서버 중지 시 에러 메시지 표시 확인\n- API 키 오류 시 에러 메시지 표시 확인\n- 에러 발생 후 로딩 표시가 해제되고, [복사하기] 버튼이 비활성화되는지 확인\n- Console에 적절한 에러 로그가 출력되는지 확인",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "GitHub 레포지토리에 코드 푸시 및 .gitignore 검증",
+        "description": "전체 코드를 GitHub 레포지토리에 푸시하고, .env 파일이 커밋되지 않도록 .gitignore가 올바르게 설정되었는지 확인합니다.",
+        "details": "1. .gitignore 파일에 다음 항목들이 포함되어 있는지 확인:\n   - .env\n   - __pycache__/\n   - *.pyc\n   - .DS_Store\n   - .venv/ (가상환경)\n2. git status 명령으로 .env 파일이 untracked 상태인지 확인\n3. 변경사항 스테이징: git add .\n4. 커밋 생성: git commit -m \"프론트엔드 기능 완성 및 통합 테스트 완료\"\n5. GitHub 원격 레포지토리에 푸시: git push origin main\n6. GitHub 웹에서 레포지토리 확인 → .env 파일이 커밋되지 않았는지 확인\n7. README.md 파일 작성 (선택사항):\n   - 프로젝트 설명\n   - 로컬 실행 방법\n   - 기술 스택\n\n**보안 확인**:\n- .env 파일이 절대 GitHub에 노출되지 않도록 주의\n- API 키가 코드 내에 하드코딩되지 않았는지 확인",
+        "testStrategy": "- git status 명령으로 .env 파일이 untracked 상태인지 확인\n- GitHub 웹에서 .env 파일이 레포지토리에 없는지 확인\n- 모든 소스 코드(backend/, frontend/, .gitignore, requirements.txt 등)가 정상적으로 푸시되었는지 확인",
+        "priority": "high",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Vercel 배포 및 프로덕션 환경 테스트",
+        "description": "Vercel에 프론트엔드와 백엔드를 함께 배포하고, 배포된 URL에서 실제 변환 기능이 정상 작동하는지 테스트합니다.",
+        "details": "1. Vercel 계정 생성 및 GitHub 연동\n2. Vercel에서 새 프로젝트 생성 → GitHub 레포지토리 선택\n3. 빌드 설정:\n   - Framework Preset: Other (또는 FastAPI)\n   - Build Command: (비워둠 또는 `pip install -r backend/requirements.txt`)\n   - Output Directory: frontend\n   - Install Command: pip install -r backend/requirements.txt\n4. 환경 변수 설정:\n   - UPSTAGE_API_KEY: Vercel 프로젝트 설정 → Environment Variables에 추가\n5. vercel.json 파일 생성 (프로젝트 루트):\n   ```json\n   {\n     \"builds\": [\n       {\"src\": \"backend/main.py\", \"use\": \"@vercel/python\"}\n     ],\n     \"routes\": [\n       {\"src\": \"/api/(.*)\", \"dest\": \"backend/main.py\"},\n       {\"src\": \"/(.*)\", \"dest\": \"frontend/$1\"}\n     ]\n   }\n   ```\n6. 배포 실행 → Vercel이 자동으로 빌드 및 배포\n7. 배포 완료 후 Vercel에서 제공한 URL로 접속\n8. 프로덕션 환경에서 전체 기능 테스트:\n   - 텍스트 입력 → 수신 대상 선택 → 변환하기 → 결과 표시 → 복사하기\n9. app.js의 API_BASE를 배포된 백엔드 URL로 수정 (또는 상대 경로 사용)\n10. 재배포 후 최종 확인\n\n**주의사항**:\n- Vercel의 Serverless Function 제한 사항 확인 (타임아웃, 메모리 등)\n- CORS 설정이 프로덕션 도메인에 맞게 조정되었는지 확인\n- API 키가 Vercel 환경 변수로 안전하게 관리되는지 확인",
+        "testStrategy": "- 배포된 URL에서 프론트엔드가 정상적으로 로드되는지 확인\n- 배포된 URL에서 /api/convert 엔드포인트가 정상 작동하는지 확인\n- 실제 텍스트 변환 요청이 성공하고, 결과가 화면에 표시되는지 확인\n- 복사하기 버튼이 정상 작동하는지 확인\n- 브라우저 Console에 에러가 없는지 확인\n- 다양한 브라우저(Chrome, Firefox, Safari 등)에서 테스트",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2026-08-06T07:18:14.126Z",
+      "updated": "2026-08-06T07:18:14.126Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
