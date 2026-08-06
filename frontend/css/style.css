@@ -1,0 +1,315 @@
+:root {
+  --backdrop: #232320;
+  --paper: #F5F4EF;
+  --ink: #1C1C1A;
+  --ink-faint: #8D8D86;
+
+  --font-mono: "Nanum Gothic Coding", "Courier New", monospace;
+
+  --tooth: 7px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--backdrop);
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.06), transparent 60%);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: center;
+  padding: 56px 16px;
+}
+
+.page {
+  width: 100%;
+  max-width: 400px;
+}
+
+.receipt {
+  background: var(--paper);
+  padding: 26px 24px 22px;
+  clip-path: polygon(
+    0% 0px, 6.25% var(--tooth), 12.5% 0px, 18.75% var(--tooth), 25% 0px, 31.25% var(--tooth),
+    37.5% 0px, 43.75% var(--tooth), 50% 0px, 56.25% var(--tooth), 62.5% 0px, 68.75% var(--tooth),
+    75% 0px, 81.25% var(--tooth), 87.5% 0px, 93.75% var(--tooth), 100% 0px,
+    100% 100%, 93.75% calc(100% - var(--tooth)), 87.5% 100%, 81.25% calc(100% - var(--tooth)),
+    75% 100%, 68.75% calc(100% - var(--tooth)), 62.5% 100%, 56.25% calc(100% - var(--tooth)),
+    50% 100%, 43.75% calc(100% - var(--tooth)), 37.5% 100%, 31.25% calc(100% - var(--tooth)),
+    25% 100%, 18.75% calc(100% - var(--tooth)), 12.5% 100%, 6.25% calc(100% - var(--tooth)), 0% 100%
+  );
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.45)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
+}
+
+.receipt-head {
+  text-align: center;
+  padding: 10px 0 16px;
+}
+
+.brand {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+}
+
+.line-item {
+  padding: 16px 0;
+}
+
+.item-label {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.item-label::before {
+  content: "> ";
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 110px;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.char-count {
+  margin: 6px 0 0;
+  text-align: right;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+.char-count.is-over {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.divider {
+  margin: 0;
+  height: 0;
+  border-top: 1px dashed var(--ink-faint);
+}
+
+.divider-heavy {
+  border-top: 3px double var(--ink);
+}
+
+.target-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.target-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 8px;
+  background: var(--paper);
+  border: 1px solid transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.target-btn:hover {
+  border-color: var(--ink);
+}
+
+.checkbox {
+  font-weight: 700;
+  white-space: pre;
+}
+
+.target-label {
+  flex: 0 0 auto;
+}
+
+.target-desc {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-size: 0.75rem;
+}
+
+.target-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.target-btn[aria-pressed="true"] .target-desc {
+  color: var(--paper);
+  opacity: 0.75;
+}
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-print {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 0;
+  background: var(--paper);
+  border: 1px dashed var(--ink);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.btn-print:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-print:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-print:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-print.is-loading #convertBtnLabel::after {
+  content: "\2588";
+  margin-left: 2px;
+  animation: blink 900ms steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.status-message {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+.result-section {
+  padding-top: 16px;
+}
+
+.printout {
+  min-height: 130px;
+  padding: 10px 2px 4px;
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.result-text {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.result-text.is-typing::after {
+  content: "\2588";
+  animation: blink 900ms steps(1) infinite;
+}
+
+.printout.has-error .result-text {
+  font-weight: 700;
+}
+
+.btn-copy {
+  display: block;
+  margin: 4px 0 0 auto;
+  padding: 5px 10px;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.btn-copy:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.btn-copy:disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+
+.barcode {
+  height: 30px;
+  margin: 16px 0 10px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--ink) 0px, var(--ink) 2px,
+    transparent 2px, transparent 5px,
+    var(--ink) 5px, var(--ink) 6px,
+    transparent 6px, transparent 10px,
+    var(--ink) 10px, var(--ink) 13px,
+    transparent 13px, transparent 15px,
+    var(--ink) 15px, var(--ink) 18px,
+    transparent 18px, transparent 20px
+  );
+}
+
+.thanks {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+:focus-visible {
+  outline: 2px dashed var(--ink);
+  outline-offset: 3px;
+}
+
+@media (max-width: 380px) {
+  .target-desc {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-print.is-loading #convertBtnLabel::after,
+  .result-text.is-typing::after {
+    animation: none;
+  }
+}
