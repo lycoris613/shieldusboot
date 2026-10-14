@@ -10,6 +10,7 @@
 | [`frontendhcj`](frontendhcj) | HTML · CSS · JS · ES6 · React 실습과 과제 |
 | [`webscrapy`](webscrapy) | 웹 스크래핑 · 데이터 분석과 시각화 노트북 |
 | [`vibeantigravity`](vibeantigravity) | Antigravity 기반 바이브 코딩 프로젝트 (biztalk, subagent skills, 웹스크래핑) |
+| [`summary`](summary) | 과목별 정리 노트 (BACKEND, FRONTEND, WEBSCRAP, CODETEST, CYBERSECURE) |
 
 ## 참고
 
