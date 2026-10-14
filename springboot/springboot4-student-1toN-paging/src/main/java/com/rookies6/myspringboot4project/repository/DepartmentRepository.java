@@ -1,0 +1,80 @@
+package com.rookies6.myspringboot4project.repository;
+
+import com.rookies6.myspringboot4project.entity.Department;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface DepartmentRepository extends JpaRepository<Department, Long> {
+
+    Optional<Department> findByCode(String code);
+
+    //--------------------------------------------------------------------
+    // 학과 목록 + 학생 수를 한 번의 쿼리로 조회 ( 학생 엔티티는 로딩하지 않는다 )
+    // LEFT JOIN 이므로 학생이 없는 학과도 studentCount = 0 으로 조회된다.
+    // AS 별칭이 DepartmentSummary 의 메서드 이름과 짝을 이룬다.
+    //--------------------------------------------------------------------
+
+    @Query("SELECT d.id AS id, d.name AS name, d.code AS code, COUNT(s) AS studentCount "
+            + "FROM Department d LEFT JOIN d.students s "
+            + "GROUP BY d.id, d.name, d.code ORDER BY d.id")
+    List<DepartmentSummary> findAllSummaries();
+
+    @Query(value = "SELECT d.id AS id, d.name AS name, d.code AS code, COUNT(s) AS studentCount "
+            + "FROM Department d LEFT JOIN d.students s "
+            + "GROUP BY d.id, d.name, d.code",
+            countQuery = "SELECT COUNT(d) FROM Department d")
+    Page<DepartmentSummary> findAllSummaries(Pageable pageable);
+
+    //--------------------------------------------------------------------
+    // [ 수업 비교용 ] 1:N 컬렉션을 페이징과 함께 조회하는 잘못된 방법 두 가지.
+    // 실제 서비스 코드에서는 사용하지 않는다. 위의 findAllSummaries(Pageable) 이 정답이다.
+    //--------------------------------------------------------------------
+
+    /**
+     * (A) 컬렉션 Fetch Join + 페이징.
+     * 결과는 맞지만 SQL 에 limit 이 붙지 않아 전체를 읽은 뒤 메모리에서 잘라낸다.
+     * 실행하면 WARN HHH90003004 경고가 출력된다.
+     */
+    @Query(value = "SELECT d FROM Department d LEFT JOIN FETCH d.students",
+            countQuery = "SELECT COUNT(d) FROM Department d")
+    Page<Department> findAllWithStudentsPaged(Pageable pageable);
+
+    /**
+     * (B) FETCH 를 뺀 일반 JOIN + 페이징.
+     * SQL 에 limit 은 붙지만 학생 수만큼 늘어난 행을 자르므로 학과 개수가 요청과 달라진다.
+     */
+    @Query(value = "SELECT d FROM Department d LEFT JOIN d.students",
+            countQuery = "SELECT COUNT(d) FROM Department d")
+    Page<Department> findAllJoinPaged(Pageable pageable);
+
+    //--------------------------------------------------------------------
+    // 학과 상세 : 소속 학생과 학생의 상세정보까지 함께 가져온다.
+    // Student.studentDetail 은 mappedBy 쪽 @OneToOne 이라 LAZY 가 동작하지 않고,
+    // 학생 수만큼 상세정보 조회 쿼리가 추가로 발생하므로 여기서 함께 조회한다.
+    //--------------------------------------------------------------------
+
+    @Query("SELECT d FROM Department d "
+            + "LEFT JOIN FETCH d.students s "
+            + "LEFT JOIN FETCH s.studentDetail "
+            + "WHERE d.id = :id")
+    Optional<Department> findByIdWithStudents(@Param("id") Long id);
+
+    //학과코드로 조회할 때에도 소속 학생을 함께 가져온다 ( 지연로딩 추가 조회를 없앤다 )
+    @Query("SELECT d FROM Department d "
+            + "LEFT JOIN FETCH d.students s "
+            + "LEFT JOIN FETCH s.studentDetail "
+            + "WHERE d.code = :code")
+    Optional<Department> findByCodeWithStudents(@Param("code") String code);
+
+    boolean existsByCode(String code);
+
+    boolean existsByName(String name);
+}

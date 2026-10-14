@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- Transaction Manager 설정 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- Transaction Advice 설정 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			
+			<!--No existing transaction found for transaction marked with propagation 'mandatory'-->
+<!-- 			<tx:method name="deleteUser" propagation="NOT_SUPPORTED"/> -->
+<!-- 			<tx:method name="delete" propagation="MANDATORY"/> -->
+			
+			<!-- 예외=Existing transaction found for transaction marked with propagation 'never' -->
+			<tx:method name="updateUser" propagation="NOT_SUPPORTED"/>
+<!-- 			<tx:method name="update" propagation="REQUIRED" /> -->
+		<tx:method name="update" propagation="MANDATORY" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- Transaction AOP 설정 -->
+	<aop:config>
+		<aop:pointcut expression="execution(public * myspring.user..*(..))" id="txPointCut"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+	</aop:config>
+
+	<!-- MapperScannerConfigurer 설정 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="myspring.**.dao.mapper"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" /> 
+	</bean>
+
+	<!-- Mapper 설정 -->
+<!-- 	<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> -->
+<!-- 		<property name="mapperInterface" value="myspring.user.dao.mapper.UserMapper" /> -->
+<!-- 		<property name="sqlSessionTemplate" ref="sqlSession" /> -->
+<!-- 	</bean> -->
+
+	<!-- SqlSessionFactoryBean 설정 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:SqlMapConfig.xml" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:UserMapper.xml</value>
+				<value>classpath:StudentMapper.xml</value>
+			</list>
+		</property>
+	</bean>
+	<!-- SqlSessionTemplate 설정 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+	<context:component-scan base-package="myspring.user,myspring.student,myspring.aop.annot">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+	<!-- @Aspect가 선언된 모든 Bean을 Aspect로 자동 등록해줌 -->
+	<aop:aspectj-autoproxy />
+
+	<!-- AOP 설정 -->
+	<aop:config>
+		<aop:aspect id="traceAspect" ref="performanceTraceAdvice">
+			<aop:around pointcut="execution(public * myspring.user..*(..))"
+				method="trace" />
+		</aop:aspect>
+	</aop:config>
+
+	<!-- Advice 클래스를 Bean으로 등록 -->
+	<bean id="performanceTraceAdvice" class="myspring.aop.xml.PerformanceTraceAdvice" />
+
+	<context:property-placeholder location="classpath:value.properties" />
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="${db.driverClass}" />
+		<property name="url" value="${db.url}" />
+		<property name="username" value="${db.username}" />
+		<property name="password" value="${db.password}" />
+	</bean>
+
+
+
+	<bean id="hello" class="myspring.di.xml.Hello">
+		<property name="name" value="${myname}" />
+		<property name="printer" ref="${myprinter}" />
+		<property name="names">
+			<list>
+				<value>${value1}</value>
+				<value>${value2}</value>
+				<value>${value3}</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="hello4" class="myspring.di.xml.Hello">
+		<property name="names">
+			<list>
+				<value>Spring</value>
+				<value>IoC</value>
+				<value>DI</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="hello3" class="myspring.di.xml.Hello">
+		<property name="name" value="스프링" />
+	</bean>
+
+
+	<bean id="hello2" class="myspring.di.xml.Hello">
+		<constructor-arg index="0" value="Spring" />
+		<constructor-arg index="1" ref="printer" />
+	</bean>
+
+	<bean id="printer" class="myspring.di.xml.StringPrinter" />
+
+	<bean id="consolePrinter" class="myspring.di.xml.ConsolePrinter" />
+
+	<bean id="hello1" class="myspring.di.xml.Hello">
+		<property name="name" value="Spring" />
+		<property name="printer" ref="printer" />
+		<property name="names">
+			<list>
+				<value>Spring</value>
+				<value>IoC</value>
+				<value>DI</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>

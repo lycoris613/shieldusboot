@@ -1,0 +1,92 @@
+GET http://localhost:8087/spring/studentdept
+[
+    {
+        "id": 1,
+        "code": 1002,
+        "name": "홍길동",
+        "age": 20,
+        "grade": "1학년",
+        "daynight": "주간",
+        "dept": {
+            "id": 3,
+            "code": 30,
+            "name": "영어영문학과"
+        },
+        "courseStatus": null
+    }
+]    
+-----------------------------------------------
+GET http://localhost:8087/spring/studentcourse
+[
+    {
+        "id": 1,
+        "code": 1002,
+        "name": "홍길동",
+        "age": 20,
+        "grade": "1학년",
+        "daynight": "주간",
+        "dept": {
+            "id": 3,
+            "code": 30,
+            "name": "영어영문학과"
+        },
+        "courseStatus": [
+            {
+                "id": 1,
+                "student": null,
+                "course": {
+                    "id": 1,
+                    "code": 1000,
+                    "name": "자바프로그래밍",
+                    "instructor": "김자바"
+                },
+                "score": 90
+            },
+            {
+                "id": 2,
+                "student": null,
+                "course": {
+                    "id": 2,
+                    "code": 2000,
+                    "name": "파이썬프로그래밍",
+                    "instructor": "박파이썬"
+                },
+                "score": 80
+            },
+            {
+                "id": 4,
+                "student": null,
+                "course": {
+                    "id": 2,
+                    "code": 2000,
+                    "name": "파이썬프로그래밍",
+                    "instructor": "박파이썬"
+                },
+                "score": 85
+            }
+        ]
+    }
+]
+----------------------------------------
+POST http://localhost:8087/spring/students
+{
+        "code": 1010,
+        "name": "백명숙10",
+        "age": 22,
+        "grade": "2학년",
+        "daynight": "주간",
+        "dept": {
+            "code": 30
+        }
+}
+------------------------------------------
+POST http://localhost:8087/spring/coursestatus
+{
+    "student":{
+        "code":1010
+    },
+    "course":{
+        "code":3000
+    },
+    "score":200
+}

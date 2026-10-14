@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- <mapper namespace="studentNS"> -->
+<mapper namespace="myspring.student.dao.mapper.StudentMapper">
+
+	<resultMap id="studentDeptResultMap" type="Student">
+		<id property="id" column="stu_id" javaType="Long" jdbcType="NUMERIC" />
+		<result property="code" column="stu_code" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="name" column="stu_name" javaType="String" jdbcType="VARCHAR" />
+		<result property="age" column="stu_age" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="grade" column="stu_grade" javaType="String" jdbcType="VARCHAR" />
+		<result property="daynight" column="stu_daynight" javaType="String" jdbcType="VARCHAR" />
+		<association property="dept" column="dept_code" javaType="Dept" resultMap="deptResultMap" />
+	</resultMap>
+			
+	<resultMap id="studentCourseStatusResultMap" type="Student">
+		<id property="id" column="stu_id" javaType="Long" jdbcType="NUMERIC" />
+		<result property="code" column="stu_code" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="name" column="stu_name" javaType="String" jdbcType="VARCHAR" />
+		<result property="age" column="stu_age" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="grade" column="stu_grade" javaType="String" jdbcType="VARCHAR" />
+		<result property="daynight" column="stu_daynight" javaType="String" jdbcType="VARCHAR" />
+		<association property="dept" column="dept_code" javaType="Dept" resultMap="deptResultMap" />
+		<collection property="courseStatus" ofType="CourseStatus" resultMap="coursestatusResultMap" />			
+	</resultMap>
+	
+	<resultMap id="studentResultMap" type="Student">
+		<id property="id" column="stu_id" javaType="Long" jdbcType="NUMERIC" />
+		<result property="code" column="stu_code" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="name" column="stu_name" javaType="String" jdbcType="VARCHAR" />
+		<result property="age" column="stu_age" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="grade" column="stu_grade" javaType="String" jdbcType="VARCHAR" />
+		<result property="daynight" column="stu_daynight" javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap id="deptResultMap" type="Dept">
+		<id property="id" column="dept_id" javaType="Long" jdbcType="NUMERIC" />
+		<result property="code" column="dept_code" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="name" column="dept_name" javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="courseResultMap" type="Course">
+		<id property="id" column="course_id" javaType="Long" jdbcType="NUMERIC" />
+		<result property="code" column="course_code" javaType="Integer" jdbcType="NUMERIC" />
+		<result property="name" column="course_name" javaType="String" jdbcType="VARCHAR" />
+		<result property="instructor" column="course_instructor" javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="coursestatusResultMap" type="CourseStatus">
+		<id property="id" column="status_id" javaType="Long" jdbcType="NUMERIC" />
+		<result property="score" column="course_score" javaType="Integer" jdbcType="NUMERIC" />
+		<association property="course" column="course_code" javaType="Course" resultMap="courseResultMap" />
+	</resultMap>
+
+	<select id="selectStudentDept" resultMap="studentDeptResultMap">
+		select 
+		s.stu_id,
+		s.stu_code,
+		s.stu_name,
+		s.stu_age,
+		s.stu_grade,
+		s.stu_daynight,
+		d.dept_id,
+		d.dept_code,
+		d.dept_name
+		from student s, dept d
+		where s.dept_code = d.dept_code
+	</select>
+
+	<select id="selectStudentCourseStatus" resultMap="studentCourseStatusResultMap">
+		select  s.stu_id,
+		        s.stu_code,
+		        s.stu_name,
+		        s.stu_age,
+		        s.stu_grade,
+		        s.stu_daynight,
+		        d.dept_id,
+		        d.dept_code,
+		        d.dept_name,
+		        c.course_id,
+		        c.course_code,
+		        c.course_name,
+		        c.course_instructor,
+		        t.status_id,
+		        t.COURSE_SCORE
+		from  student s, dept d, course_status t, course c
+		where s.stu_code = t.stu_code
+		  and s.dept_code = d.dept_code
+		  and t.course_code = c.course_code
+	</select>
+
+	<select id="selectCourse" resultMap="courseResultMap">
+		select 	COURSE_ID,
+       			COURSE_CODE,
+       			COURSE_NAME,
+       			COURSE_INSTRUCTOR
+  		   from COURSE
+		order by COURSE_ID
+	</select>
+
+	<sql id="selectStudent">
+		select * from student
+	</sql>
+	
+	<select id="selectStudentByName" parameterType="String"
+		resultMap="studentResultMap">
+		<include refid="selectStudent" />
+		where stu_name like CONCAT('%',#{keyword},'%')
+	</select>
+
+	<select id="selectStudentByGradeOrDay" parameterType="Student"
+		resultMap="studentResultMap">
+		<include refid="selectStudent" />
+		<where>
+			<if test="grade != null">
+				stu_grade = #{grade}
+			</if>
+			<if test="daynight != null">
+				and stu_daynight = #{daynight}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectStudentByGradeOrDayMap" parameterType="Map"
+		resultMap="studentResultMap">
+		<include refid="selectStudent" />
+		<where>
+			<if test="grade != null">
+				stu_grade = #{grade}
+			</if>
+			<if test="day != null">
+				or stu_daynight = #{daynight}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="selectStudentGrade" resultType="integer">
+		select count(*) stu_cnt from STUDENT group by STU_GRADE
+	</select>
+
+	<insert id="insertCourse" parameterType="Course">
+		insert into course
+		(course_code,course_name,course_instructor)
+		values(#{code},#{name},#{instructor})
+	</insert>
+
+	<insert id="insertStudent" parameterType="Student">
+		insert into student
+		(stu_code,stu_name,stu_age,stu_grade,stu_daynight,dept_code)
+		values(
+		#{code},
+		#{name},
+		#{age},
+		#{grade},
+		#{daynight},#{dept.code} )
+	</insert>
+
+	<update id="updateStudent" parameterType="Student">
+		update student set
+		stu_name = #{name},
+		stu_age = #{age},
+		stu_grade = #{grade},
+		stu_daynight = #{daynight},
+		dept_code = #{dept.code}
+		where stu_id = #{id}
+	</update>
+
+	<insert id="insertCourseStatus" parameterType="CourseStatus">
+		insert into COURSE_STATUS (STU_CODE,COURSE_CODE,COURSE_SCORE)
+		values (#{student.code},#{course.code},#{score})
+	</insert>
+	
+	<delete id="deleteStudent" parameterType="Integer">
+		delete from student where stu_id = #{value}
+	</delete>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,107 @@
+/* ---------------------------------------------------------
+   App.css — 머리말과 페이지 바깥틀
+
+   페이지 안쪽 모양은 각 컴포넌트가 자기 CSS 를 갖고 있습니다.
+     TodoListTemplate.css · Form.css · TodoItem.css · MyComponent.css
+   여기에는 라우터를 붙이면서 새로 생긴 것만 적습니다.
+   --------------------------------------------------------- */
+
+/* 어느 페이지에서나 보이는 머리말 */
+.app-header {
+    display: flex;
+    /* 제목과 링크를 한 줄에 */
+    justify-content: space-between;
+    /* 제목은 왼쪽, 링크는 오른쪽 */
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto 20px;
+    padding: 16px 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목과 개수를 한 덩어리로 묶는다.
+   머리말이 space-between 이라 자식이 둘이어야 배치가 유지된다. */
+.app-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+/* 머리말에 늘 떠 있는 할 일 개수 */
+.todo-count {
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #333;
+}
+
+.app-nav {
+    display: flex;
+    gap: 8px;
+}
+
+/* NavLink 는 a 태그로 그려진다. a 는 기본이 inline 이라
+   padding 이 제대로 먹지 않으므로 inline-block 으로 바꾼다. */
+.nav-link {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 5px;
+    color: #555;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.nav-link:hover {
+    background-color: #f1f3f5;
+}
+
+/* 지금 보고 있는 쪽. NavLink 가 isActive 일 때만 붙여 준다. */
+.nav-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* 각 페이지의 본문을 감싸는 상자 */
+.page {
+    display: block;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+}
+
+/* ── /basic 페이지 ─────────────────────────────────────── */
+
+.basic-hint {
+    margin: 0 0 16px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* 화면이 넓으면 둘을 나란히, 좁으면 위아래로 놓는다. */
+.basic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.basic-card {
+    background-color: white;
+    border-radius: 5px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.basic-card h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+}
