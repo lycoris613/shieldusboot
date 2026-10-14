@@ -11,6 +11,7 @@
 | [`webscrapy`](webscrapy) | 웹 스크래핑 · 데이터 분석과 시각화 노트북 |
 | [`vibeantigravity`](vibeantigravity) | Antigravity 기반 바이브 코딩 프로젝트 (biztalk, subagent skills, 웹스크래핑) |
 | [`summary`](summary) | 과목별 정리 노트 (BACKEND, FRONTEND, WEBSCRAP, CODETEST, CYBERSECURE) |
+| [`llmlangchain`](llmlangchain) | LLM · LangChain 실습 (RAG, Ollama, 챗봇, Tool/Agent, LangGraph) |
 
 ## 참고
 
