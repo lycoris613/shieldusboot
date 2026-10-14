@@ -1,0 +1,309 @@
+/* ---------------------------------------------------------
+   style.css — book/css/form10.css 를 그대로 옮겨 왔습니다.
+   달라진 곳은 두 군데입니다.
+
+   (1) .form-row 대신 .form-grid 를 씁니다.
+       입력칸을 두 개씩 묶어 줄을 만들던 것을, 화면 너비에 맞춰
+       스스로 칸 수를 정하는 그리드로 바꿨습니다.
+   (2) 맨 아래에 ECMAScript 버전에서 새로 생긴 규칙을 더했습니다.
+       모드 배지, 빈 목록 안내, 수정 모드 강조입니다.
+   --------------------------------------------------------- */
+
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    /* 화면이 넓어도 1200px 를 넘지 않게 한다 */
+    margin: 0 auto;
+    /* 좌우 여백을 자동으로 나눠 가운데 정렬 */
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 제목 옆의 TEST / PROD 배지 */
+.app-mode {
+    font-size: 0.5em;
+    /* 제목보다 훨씬 작게 — em 은 부모 글자 크기의 배수다 */
+    vertical-align: middle;
+    /* 제목 글자의 가운데 높이에 맞춘다 */
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: white;
+    letter-spacing: 1px;
+}
+
+/* 개발 모드 — 눈에 띄지 않는 회색 */
+.app-mode.test {
+    background-color: #757575;
+}
+
+/* 운영 모드 — 실수로 운영을 건드리지 않도록 빨간색 */
+.app-mode.prod {
+    background-color: #f44336;
+}
+
+h2 {
+    color: #444;
+    border-bottom: 2px solid #4CAF50;
+    /* 부제목 아래에 2픽셀 두께의 녹색 밑줄 추가 */
+    padding-bottom: 5px;
+}
+
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    /* 패딩과 테두리를 width 에 포함 */
+}
+
+textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+    /* 세로 방향으로만 크기를 바꿀 수 있게 한다 */
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    /* 칸 사이의 테두리를 겹쳐 한 줄로 만든다 */
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+    /* 마우스를 올린 행의 배경색을 연한 회색으로 */
+}
+
+/* 폼을 감싸는 컨테이너 */
+.form-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 입력칸들을 화면 너비에 맞춰 자동으로 배치한다.
+   form10.css 의 .form-row 를 대신하는 규칙이다. */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* 한 칸은 최소 250px, 남는 자리는 똑같이 나눠 갖는다.
+       화면이 좁아지면 칸 수가 저절로 줄어든다. */
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    /* 라벨과 입력칸을 세로로 쌓는다 */
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+/* 표를 감싸는 컨테이너 */
+.table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* 목록을 불러오는 동안 보여 주는 안내 */
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+/* 폼 아래에 뜨는 오류 · 성공 메시지.
+   React 에서는 메시지가 있을 때만 태그가 생기므로 display 를 감출 필요가 없다. */
+.error-message {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.cancel-btn {
+    background-color: #757575;
+}
+
+.cancel-btn:hover {
+    background-color: #616161;
+}
+
+/* 제출 버튼 · 취소 버튼 · 메시지를 한 줄에 놓는다 */
+.button-group {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    /* 화면이 좁으면 줄을 바꾼다 */
+    gap: 10px;
+}
+
+/* 표 안의 작은 버튼 세 가지 — 공통 부분 */
+.edit-btn,
+.delete-btn,
+.detail-btn {
+    padding: 5px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.edit-btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #1976D2;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+.detail-btn {
+    background-color: #FF9800;
+    color: white;
+}
+
+.detail-btn:hover {
+    background-color: #F57C00;
+}
+
+/* ---- ECMAScript 버전에서 추가된 스타일 ---- */
+
+/* 목록이 비었을 때 보여 주는 안내 행 */
+.empty-row {
+    text-align: center;
+    color: #888;
+    padding: 24px 10px;
+}
+
+/* 목록을 불러오지 못했을 때 보여 주는 행 */
+.error-row {
+    text-align: center;
+    color: #f44336;
+    padding: 24px 10px;
+}
+
+/* 수정 모드일 때 폼 전체를 살짝 강조한다 */
+.form-container.editing {
+    border-left: 4px solid #4CAF50;
+    /* 왼쪽에 녹색 띠 */
+}
+
+/* ---- book_react_first 에서 추가된 스타일 (과제 10 · 상세 보기) ---- */
+
+/* 상세 보기 — book 이 null 이 아닐 때만 그려지는 모달 배경 */
+.detail-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.detail-card {
+    position: relative;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 24px 28px;
+    width: min(480px, 90vw);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.detail-card h2 {
+    margin-top: 0;
+}
+
+.detail-card p {
+    margin: 6px 0;
+    color: #444;
+}
+
+.detail-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background-color: #757575;
+    padding: 4px 10px;
+}
+
+.detail-close-btn:hover {
+    background-color: #616161;
+}
